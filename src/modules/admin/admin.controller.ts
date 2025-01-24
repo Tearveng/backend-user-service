@@ -1,7 +1,15 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from '../role/roles.decoration';
 import { RolesGuard } from '../role/roles.guard';
+import { RegisterUserDTO } from '../../dto/RegisterUserDTO';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -10,7 +18,10 @@ export class AdminController {
   @Roles('admin')
   @UseGuards(RolesGuard)
   @Get('/users')
-  getAllUsersPagination() {
+  getAllUsersPagination(@Request() request) {
     return 'Welcome to the admin dashboard';
   }
+
+  @Post()
+  createUser(@Body() payload: RegisterUserDTO) {}
 }

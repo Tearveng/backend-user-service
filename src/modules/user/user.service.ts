@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UsersEntity } from '../entities/Users';
+import { UsersEntity } from '../../entities/Users';
 import { bcrypt } from 'bcrypt';
 
 const saltRounds = 10;
@@ -68,7 +68,7 @@ export class UserService {
   }
 
   // find user by id
-  async findById(email: string) {
+  async findByEmail(email: string) {
     const user = await this.userRepository.findOneBy({
       email,
     });

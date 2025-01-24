@@ -6,10 +6,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseConfig } from './config';
 import { CloudinaryModule } from './shared/cloudinary/cloudinary.module';
-import { UserModule } from './user/user.module';
+import { UserModule } from './modules/user/user.module';
 import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './role/roles.guard';
-import { AdminModule } from './admin/admin.module';
+import { RolesGuard } from './modules/role/roles.guard';
+import { AdminModule } from './modules/admin/admin.module';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
@@ -25,6 +27,11 @@ import { AdminModule } from './admin/admin.module';
       }),
       inject: [ConfigService],
     }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '1h' },
+    }),
+    PassportModule,
     CloudinaryModule,
     UserModule,
     AdminModule,
