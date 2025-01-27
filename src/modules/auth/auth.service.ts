@@ -1,6 +1,6 @@
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { JwtPayload } from '../../shared/jwt-payload.interface';
 import { LoginDTO } from '../../dto/LoginDTO';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
@@ -14,7 +14,7 @@ export class AuthService {
 
   async validateUser(email: string, pass: string) {
     const user = await this.usersService.findByEmail(email);
-    if (user && bcrypt.compare(pass, user.password)) {
+    if (user && bcrypt.compareSync(pass, user.password)) {
       return user;
     }
     return null;
@@ -30,9 +30,13 @@ export class AuthService {
       sub: `${validateUser.id}`,
     };
     return {
+      firstName: validateUser.firstName,
+      lastName: validateUser.lastName,
       username: validateUser.username,
       email: validateUser.email,
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, {
+        secret: process.env.JWT_SECRET,
+      }),
       roles: validateUser.roles,
     };
   }

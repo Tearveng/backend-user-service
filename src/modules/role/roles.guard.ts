@@ -2,12 +2,12 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
+import * as process from 'node:process';
 
 @Injectable()
 export class RolesGuard extends JwtAuthGuard implements CanActivate {
@@ -35,7 +35,9 @@ export class RolesGuard extends JwtAuthGuard implements CanActivate {
     }
 
     try {
-      const tokenPayload = await this.jwtService.verify(token);
+      const tokenPayload = await this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET,
+      });
       request.user = {
         userId: tokenPayload.sub,
         username: tokenPayload.username,

@@ -18,19 +18,19 @@ export class UsersEntity {
   @Column()
   lastName: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
-  @Column({ default: '' })
+  @Column({ nullable: true })
   phone: string;
 
   @Column()
   password: string;
 
-  @Column()
+  @Column({ nullable: true })
   profile: string;
 
-  @Column({ default: '' })
+  @Column({ nullable: true })
   publicId: string;
 
   username: string;

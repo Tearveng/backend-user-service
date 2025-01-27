@@ -5,11 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { UsersEntity } from '../../entities/Users';
-import { bcrypt } from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
-const saltRounds = 10;
+export const saltRounds = 10;
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -25,7 +25,7 @@ export class UserService {
     if (existEmail) {
       this.logger.error(`user already exist with this email ${email}`);
       throw new BadRequestException(
-        `Product already exist with this skuCode ${email}`,
+        `User already exist with this email`,
         `${email}`,
       );
     }
@@ -33,7 +33,7 @@ export class UserService {
   }
 
   // create user
-  async createUser(user: UsersEntity) {
+  async createUser(user: DeepPartial<UsersEntity>) {
     await this.findExistByEmail(user.email);
     const hasPassword = bcrypt.hashSync(user.password, saltRounds);
     const create = this.userRepository.create({

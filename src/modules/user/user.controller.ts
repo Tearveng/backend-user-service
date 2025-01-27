@@ -20,7 +20,7 @@ export class UserController {
     return this.userService.paginateUsers(page, limit);
   }
 
-  @Post()
+  @Post('/login')
   async login(@Body() user: LoginDTO) {
     return this.authService.login(user);
   }
