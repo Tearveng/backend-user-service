@@ -1,9 +1,9 @@
-import { UserService } from '../user/user.service';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import { JwtPayload } from '../../shared/jwt-payload.interface';
 import { LoginDTO } from '../../dto/LoginDTO';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtPayload } from '../../shared/jwt-payload.interface';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +28,7 @@ export class AuthService {
     const payload: JwtPayload = {
       username: validateUser.username,
       sub: `${validateUser.id}`,
+      roles: validateUser.roles
     };
     return {
       firstName: validateUser.firstName,

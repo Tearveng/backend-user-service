@@ -3,30 +3,36 @@ import {
   Controller,
   Get,
   Post,
-  Request,
-  UseGuards,
+  Query
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Roles } from '../role/roles.decoration';
-import { RolesGuard } from '../role/roles.guard';
 import { RegisterUserDTO } from '../../dto/RegisterUserDTO';
+import { UserService } from '../user/user.service';
 import { AdminService } from './admin.service';
 
-@Controller('admin')
+@Controller('ADMIN')
 @ApiTags('admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly userService: UserService
+  ) {}
 
   // constructor(private readonly adminService: AdminService) {}
-  @Roles('admin')
-  @UseGuards(RolesGuard)
+  // @Roles('admin')
+  // @UseGuards(RolesGuard)
   @Get('/users')
-  getAllUsersPagination(@Request() request) {
-    return 'Welcome to the admin dashboard';
-  }
+  @Get()
+    async getAllUsersPagination(
+      @Query('page') page = 1,
+      @Query('limit') limit = 10,
+    ) {
+      return this.userService.paginateUsers(page, limit);
+    }
 
   @Post('/create-user')
   createUser(@Body() payload: RegisterUserDTO) {
+    console.log("payload", payload)
     return this.adminService.registerUser(payload);
   }
 }

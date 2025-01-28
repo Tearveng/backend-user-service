@@ -15,7 +15,7 @@ export class AdminService {
   async registerUser(user: RegisterUserDTO) {
     return this.usersService.createUser({
       ...user,
-      roles: ['USER'],
+      roles: ['ADMIN'],
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { LoginDTO } from '../../dto/LoginDTO';
@@ -24,4 +24,10 @@ export class UserController {
   async login(@Body() user: LoginDTO) {
     return this.authService.login(user);
   }
+
+  @Get('/user/:id')
+  async getById(@Param('id') id: number) {
+    return this.userService.findById(id);
+  }
+
 }
