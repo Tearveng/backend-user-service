@@ -9,6 +9,7 @@ import * as bcrypt from 'bcryptjs';
 import { omit } from 'src/utils/RemoveAttribute';
 import { DeepPartial, Repository } from 'typeorm';
 import { UsersEntity } from '../../entities/Users';
+import {UpdateUserDTO} from "../../dto/RegisterUserDTO";
 
 export const saltRounds = 10;
 @Injectable()
@@ -79,6 +80,23 @@ export class UserService {
         currentPage: page,
       },
     };
+  }
+
+  // update user
+  async updateUser(id: number, user: UpdateUserDTO) {
+    const previous = await this.findById(id);
+    const save = await this.userRepository.save({
+      ...previous,
+      ...user,
+    });
+    this.logger.log('user is updated', save);
+    return save;
+  }
+
+  // delete user
+  async deleteUser(id: number) {
+    this.logger.log('user is deleted', id);
+    return this.userRepository.delete(id);
   }
 
   // find user by id

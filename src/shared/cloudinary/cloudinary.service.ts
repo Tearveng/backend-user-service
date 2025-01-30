@@ -18,7 +18,9 @@ export class CloudinaryService {
     try {
       return await new Promise((resolve, reject) => {
         const upload = uploadV2.uploader.upload_stream(
-          { folder: process.env.CLOUDINARY_FOLDER_NAME },
+          {
+            folder: `${process.env.CLOUDINARY_FOLDER_NAME}/${process.env.CLOUDINARY_FOLDER_PROFILE_NAME}`,
+          },
           (error, result) => {
             if (error) {
               return reject(error);

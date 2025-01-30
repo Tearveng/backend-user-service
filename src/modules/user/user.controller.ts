@@ -29,5 +29,4 @@ export class UserController {
   async getById(@Param('id') id: number) {
     return this.userService.findById(id);
   }
-
 }
