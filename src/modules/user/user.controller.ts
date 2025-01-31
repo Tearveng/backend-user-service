@@ -20,10 +20,10 @@ export class UserController {
     return this.userService.paginateUsers(page, limit);
   }
 
-  @Post('/login')
-  async login(@Body() user: LoginDTO) {
-    return this.authService.login(user);
-  }
+  // @Post('/login')
+  // async login(@Body() user: LoginDTO) {
+  //   return this.authService.login(user);
+  // }
 
   @Get('/user/:id')
   async getById(@Param('id') id: number) {

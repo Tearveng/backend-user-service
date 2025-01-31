@@ -12,6 +12,7 @@ import { RolesGuard } from './modules/role/roles.guard';
 import { AdminModule } from './modules/admin/admin.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { PassportModule } from '@nestjs/passport';
     CloudinaryModule,
     UserModule,
     AdminModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

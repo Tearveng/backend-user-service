@@ -9,7 +9,7 @@ import * as bcrypt from 'bcryptjs';
 import { omit } from 'src/utils/RemoveAttribute';
 import { DeepPartial, Repository } from 'typeorm';
 import { UsersEntity } from '../../entities/Users';
-import {UpdateUserDTO} from "../../dto/RegisterUserDTO";
+import { UpdateUserDTO } from '../../dto/RegisterUserDTO';
 
 export const saltRounds = 10;
 @Injectable()
@@ -99,7 +99,7 @@ export class UserService {
     return this.userRepository.delete(id);
   }
 
-  // find user by id
+  // find user by email
   async findByEmail(email: string) {
     const user = await this.userRepository.findOneBy({
       email,

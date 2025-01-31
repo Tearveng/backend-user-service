@@ -42,7 +42,7 @@ export class RolesGuard extends JwtAuthGuard implements CanActivate {
       request.user = {
         userId: tokenPayload.sub,
         username: tokenPayload.username,
-        roles: tokenPayload.roles
+        roles: tokenPayload.roles,
       };
 
       return tokenPayload.roles.includes('ADMIN');
