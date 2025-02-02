@@ -44,7 +44,6 @@ export class AuthService {
       throw new UnauthorizedException('Refresh token is expired or invalid');
     }
     const decodedToken = decodeToken(this.jwtService, refreshToken);
-    console.log('decodedToken', decodedToken);
     const user = await this.findUserById(decodedToken.sub);
     return this.login(user);
   }

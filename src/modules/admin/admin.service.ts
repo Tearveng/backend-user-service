@@ -1,12 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { JwtPayload } from '../../shared/jwt-payload.interface';
-import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import { CartRepsonse } from 'src/dto/CartDTO';
+import { CartPayload } from 'src/model/Cart.interface';
+import { circularJSON } from 'src/shared/circularJSON';
+import { ClientService } from 'src/shared/services/ClientService';
 import { RegisterUserDTO, UpdateUserDTO } from '../../dto/RegisterUserDTO';
-import { Repository } from 'typeorm';
-import { UsersEntity } from '../../entities/Users';
-import { InjectRepository } from '@nestjs/typeorm';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AdminService {
@@ -14,15 +13,28 @@ export class AdminService {
 
   constructor(
     private readonly usersService: UserService,
+    private readonly clientService: ClientService,
     private readonly jwtService: JwtService,
   ) {}
 
   // register user
   async registerUser(user: RegisterUserDTO) {
-    return this.usersService.createUser({
+    const newUser = await this.usersService.createUser({
       ...user,
       roles: ['ADMIN'],
     });
+
+    if(newUser) {
+      return this.clientService.createCart(`${encodeURIComponent(newUser.id)}`);
+    }
+  }
+
+  async createCart(payload: CartPayload) {
+    const carts = circularJSON.convertJsonStringToObject(
+      await this.clientService.createCart(`${payload}`),
+    ) as CartRepsonse;
+    this.logger.log('Cart is created', carts);
+    return true;
   }
 
   // update user
