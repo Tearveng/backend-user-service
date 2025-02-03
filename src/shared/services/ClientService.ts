@@ -9,12 +9,14 @@ export class ClientService {
   constructor(private readonly httpService: HttpService) {}
 
   // create cart by userId
-  async createCart(userId: string): Promise<string> {
+  async createCart(userId: string) {
     try {
       this.logger.log(`Getting cart for ${userId}`);
       const response = await firstValueFrom(
         this.httpService
-          .post(`http://localhost:4002/carts/create-carts`, { userId })
+          .post(`http://localhost:4002/carts/create-carts`, {
+            userId,
+          })
           .pipe(
             catchError((error) => {
               this.logger.log('error', error.response);

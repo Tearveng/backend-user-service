@@ -1,8 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { CartRepsonse } from 'src/dto/CartDTO';
 import { CartPayload } from 'src/model/Cart.interface';
-import { circularJSON } from 'src/shared/circularJSON';
 import { ClientService } from 'src/shared/services/ClientService';
 import { RegisterUserDTO, UpdateUserDTO } from '../../dto/RegisterUserDTO';
 import { UserService } from '../user/user.service';
@@ -23,17 +21,20 @@ export class AdminService {
       ...user,
       roles: ['ADMIN'],
     });
-
-    if(newUser) {
-      return this.clientService.createCart(`${encodeURIComponent(newUser.id)}`);
+    if (newUser) {
+      const cart = await this.createCart({ userId: newUser.id });
+      if (cart) {
+        return newUser;
+      }
     }
+    throw new BadRequestException(
+      'Unable to create the user or the cart; the creation failed.',
+    );
   }
 
   async createCart(payload: CartPayload) {
-    const carts = circularJSON.convertJsonStringToObject(
-      await this.clientService.createCart(`${payload}`),
-    ) as CartRepsonse;
-    this.logger.log('Cart is created', carts);
+    await this.clientService.createCart(`${payload.userId}`);
+    this.logger.log('Cart is created');
     return true;
   }
 
