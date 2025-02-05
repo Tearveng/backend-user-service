@@ -1,8 +1,21 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import {RegisterUserDTO, UpdateUserDTO} from '../../dto/RegisterUserDTO';
+import { RegisterUserDTO, UpdateUserDTO } from '../../dto/RegisterUserDTO';
 import { UserService } from '../user/user.service';
 import { AdminService } from './admin.service';
+import { RolesGuard } from '../role/roles.guard';
+import { Roles } from '../role/roles.decoration';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -16,12 +29,18 @@ export class AdminController {
   // @Roles('admin')
   // @UseGuards(RolesGuard)
   @Get('/users')
-  @Get()
   async getAllUsersPagination(
     @Query('page') page = 1,
     @Query('limit') limit = 10,
   ) {
     return this.userService.paginateUsers(page, limit);
+  }
+
+  @Roles('admin')
+  @UseGuards(RolesGuard)
+  @Get('/user-info')
+  async getById(@Request() req: any) {
+    return this.userService.findById(req.user.userId);
   }
 
   @Post('/create-user')
