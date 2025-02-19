@@ -16,6 +16,7 @@ import { UserService } from '../user/user.service';
 import { AdminService } from './admin.service';
 import { RolesGuard } from '../role/roles.guard';
 import { Roles } from '../role/roles.decoration';
+import { UsersEntity } from '../../entities/Users';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -41,6 +42,16 @@ export class AdminController {
   @Get('/user-info')
   async getById(@Request() req: any) {
     return this.userService.findById(req.user.userId);
+  }
+
+  @Get('/search-users')
+  async searchUsers(
+    @Query('search') search: string,
+    @Query('key') key: keyof UsersEntity,
+  ) {
+    console.log('key', key);
+    console.log('search', search);
+    return this.userService.searchUser(key, search);
   }
 
   @Post('/create-user')

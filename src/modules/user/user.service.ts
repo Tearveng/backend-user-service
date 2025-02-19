@@ -82,6 +82,33 @@ export class UserService {
     };
   }
 
+  // search product
+  async searchUser(
+    key: keyof UsersEntity,
+    value: string,
+    page = 1,
+    limit = 10,
+  ) {
+    const [products, total] = await this.userRepository
+      .createQueryBuilder('user')
+      .where(`user.${key} like :${key}`, { [key]: `%${value}%` })
+      // .orWhere('product.lastName like :name', { lastName: `%${name}%` })
+      // .orWhere('product.skuCode like :name', { skuCode: `%${name}%` })
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getManyAndCount();
+    return {
+      data: products,
+      meta: {
+        totalItems: total,
+        itemCount: products.length,
+        itemsPerPage: limit,
+        totalPages: Math.ceil(total / limit),
+        currentPage: page,
+      },
+    };
+  }
+
   // update user
   async updateUser(id: number, user: UpdateUserDTO) {
     const previous = await this.findById(id);
