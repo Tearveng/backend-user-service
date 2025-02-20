@@ -49,8 +49,6 @@ export class AdminController {
     @Query('search') search: string,
     @Query('key') key: keyof UsersEntity,
   ) {
-    console.log('key', key);
-    console.log('search', search);
     return this.userService.searchUser(key, search);
   }
 
