@@ -31,6 +31,6 @@ async function bootstrap() {
     // customJs: '/public/swagger-custom.js', // Custom JS (if needed)
     customSiteTitle: 'Swagger - Users', // Custom site title
   }); // This will expose Swagger UI at /api
-  await app.listen(4001);
+  await app.listen(4001, '0.0.0.0');
 }
 bootstrap();

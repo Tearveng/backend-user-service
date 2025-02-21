@@ -8,8 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { omit } from 'src/utils/RemoveAttribute';
 import { DeepPartial, Repository } from 'typeorm';
-import { UsersEntity } from '../../entities/Users';
 import { UpdateUserDTO } from '../../dto/RegisterUserDTO';
+import { UsersEntity } from '../../entities/Users';
 
 export const saltRounds = 10;
 @Injectable()
@@ -32,6 +32,28 @@ export class UserService {
       );
     }
     return false;
+  }
+
+  // search user
+  async searchUsers(name: string, page = 1, limit = 10) {
+    const [users, total] = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.firstName like :firstName', { firstName: `%${name}%` })
+      .orWhere('user.phone like :phone', { phone: `%${name}%` })
+      // .orWhere('product.skuCode like :skuCode', { skuCode: `%${name}%` })
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getManyAndCount();
+    return {
+      data: users,
+      meta: {
+        totalItems: total,
+        itemCount: users.length,
+        itemsPerPage: limit,
+        totalPages: Math.ceil(total / limit),
+        currentPage: page,
+      },
+    };
   }
 
   // create user
