@@ -138,4 +138,9 @@ export class UserService {
     this.logger.log(`[User]: ${JSON.stringify(user, null, 2)}`);
     return user;
   }
+
+  // logout user
+  async logout(): Promise<boolean> {
+    return true;
+  }
 }
