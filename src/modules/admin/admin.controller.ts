@@ -12,11 +12,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { RegisterUserDTO, UpdateUserDTO } from '../../dto/RegisterUserDTO';
+import { UsersEntity } from '../../entities/Users';
+import { Roles } from '../role/roles.decoration';
+import { RolesGuard } from '../role/roles.guard';
 import { UserService } from '../user/user.service';
 import { AdminService } from './admin.service';
-import { RolesGuard } from '../role/roles.guard';
-import { Roles } from '../role/roles.decoration';
-import { UsersEntity } from '../../entities/Users';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -33,8 +33,9 @@ export class AdminController {
   async getAllUsersPagination(
     @Query('page') page = 1,
     @Query('limit') limit = 10,
+    @Query('role') role: string
   ) {
-    return this.userService.paginateUsers(page, limit);
+    return this.userService.paginateUsers(page, limit, role);
   }
 
   @Roles('admin')
@@ -55,6 +56,11 @@ export class AdminController {
   @Post('/create-user')
   createUser(@Body() payload: RegisterUserDTO) {
     return this.adminService.registerUser(payload);
+  }
+
+  @Get('/search-users')
+  async searchProducts(@Query('search') search: string) {
+    return this.userService.searchUsers(search);
   }
 
   @Put('/update-users/:id')

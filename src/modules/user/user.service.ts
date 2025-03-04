@@ -8,8 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { omit } from 'src/utils/RemoveAttribute';
 import { DeepPartial, Repository } from 'typeorm';
-import { UsersEntity } from '../../entities/Users';
 import { UpdateUserDTO } from '../../dto/RegisterUserDTO';
+import { UsersEntity } from '../../entities/Users';
 
 export const saltRounds = 10;
 @Injectable()
@@ -34,6 +34,28 @@ export class UserService {
     return false;
   }
 
+  // search user
+  async searchUsers(name: string, page = 1, limit = 10) {
+    const [users, total] = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.firstName like :firstName', { firstName: `%${name}%` })
+      .orWhere('user.phone like :phone', { phone: `%${name}%` })
+      // .orWhere('product.skuCode like :skuCode', { skuCode: `%${name}%` })
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getManyAndCount();
+    return {
+      data: users,
+      meta: {
+        totalItems: total,
+        itemCount: users.length,
+        itemsPerPage: limit,
+        totalPages: Math.ceil(total / limit),
+        currentPage: page,
+      },
+    };
+  }
+
   // create user
   async createUser(user: DeepPartial<UsersEntity>) {
     await this.findExistByEmail(user.email);
@@ -53,30 +75,46 @@ export class UserService {
       id,
     });
     if (!user) {
-      this.logger.error('User not found with this id', id);
-      throw new NotFoundException('user not found');
+      this.logger.error(`User not found with this id: "${id}"`);
+      throw new NotFoundException(`user not found with this id: ${id}`);
     }
     this.logger.log(`[User]: ${JSON.stringify(user, null, 2)}`);
     return user;
   }
 
   // find all users pagination
-  async paginateUsers(page = 1, limit = 10) {
-    const [users, total] = await this.userRepository.findAndCount({
-      order: {
-        createdAt: 'desc',
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+  async paginateUsers(page = 1, limit = 10, role: string = 'ALL') {
+    let cpUsers = [];
+    let cpTotal = 0;
+    if (role === 'ALL' || ['USER', "ADMIN", "CLIENT"].indexOf(role) < 0) {
+      const [users, total] = await this.userRepository.findAndCount({
+        order: {
+          createdAt: 'desc',
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+      cpUsers = users;
+      cpTotal = total;
+    } else {
+      const [users, total] = await this.userRepository
+        .createQueryBuilder('user')
+        .where('JSON_CONTAINS(user.roles, :roles)', { roles: `[\"${role}\"]` })
+        .orderBy('user.createdAt', 'DESC') // Order by createdAt in descending order
+        .skip((page - 1) * limit) // Pagination - skipping the number of results based on page number
+        .take(limit) // Pagination - limiting the results to `limit`
+        .getManyAndCount();
+      cpUsers = users;
+      cpTotal = total;
+    }
 
     return {
-      data: users,
+      data: cpUsers,
       meta: {
-        totalItems: total,
-        itemCount: users.length,
+        totalItems: cpTotal,
+        itemCount: cpUsers.length,
         itemsPerPage: limit,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(cpTotal / limit),
         currentPage: page,
       },
     };
