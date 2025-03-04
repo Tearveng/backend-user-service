@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { RegisterUserDTO, UpdateUserDTO } from '../../dto/RegisterUserDTO';
+import { UsersEntity } from '../../entities/Users';
 import { Roles } from '../role/roles.decoration';
 import { RolesGuard } from '../role/roles.guard';
 import { UserService } from '../user/user.service';
@@ -32,8 +33,9 @@ export class AdminController {
   async getAllUsersPagination(
     @Query('page') page = 1,
     @Query('limit') limit = 10,
+    @Query('role') role: string
   ) {
-    return this.userService.paginateUsers(page, limit);
+    return this.userService.paginateUsers(page, limit, role);
   }
 
   @Roles('admin')
@@ -43,11 +45,18 @@ export class AdminController {
     return this.userService.findById(req.user.userId);
   }
 
+  @Get('/search-users')
+  async searchUsers(
+    @Query('search') search: string,
+    @Query('key') key: keyof UsersEntity,
+  ) {
+    return this.userService.searchUser(key, search);
+  }
+
   @Post('/create-user')
   createUser(@Body() payload: RegisterUserDTO) {
     return this.adminService.registerUser(payload);
   }
-
 
   @Get('/search-users')
   async searchProducts(@Query('search') search: string) {
