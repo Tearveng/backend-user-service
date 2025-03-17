@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { omit } from 'src/utils/RemoveAttribute';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, Not, Repository } from 'typeorm';
 import { UpdateUserDTO } from '../../dto/RegisterUserDTO';
 import { UsersEntity } from '../../entities/Users';
 
@@ -83,11 +83,15 @@ export class UserService {
   }
 
   // find all users pagination
-  async paginateUsers(page = 1, limit = 10, role: string = 'ALL') {
+  async paginateUsers(req: Request, page: number, limit: number, role = 'ALL') {
+    const currentUserId = this.contextUser(req).userId;
     let cpUsers = [];
     let cpTotal = 0;
-    if (role === 'ALL' || ['USER', "ADMIN", "CLIENT"].indexOf(role) < 0) {
+    if (role === 'ALL' || ['USER', 'ADMIN', 'CLIENT'].indexOf(role) < 0) {
       const [users, total] = await this.userRepository.findAndCount({
+        where: {
+          id: Not(currentUserId),
+        },
         order: {
           createdAt: 'desc',
         },
@@ -100,6 +104,7 @@ export class UserService {
       const [users, total] = await this.userRepository
         .createQueryBuilder('user')
         .where('JSON_CONTAINS(user.roles, :roles)', { roles: `[\"${role}\"]` })
+        .andWhere('user.id != :id', { id: Number(currentUserId) })
         .orderBy('user.createdAt', 'DESC') // Order by createdAt in descending order
         .skip((page - 1) * limit) // Pagination - skipping the number of results based on page number
         .take(limit) // Pagination - limiting the results to `limit`
@@ -118,6 +123,10 @@ export class UserService {
         currentPage: page,
       },
     };
+  }
+
+  contextUser(req: any) {
+    return req.user;
   }
 
   // search product
@@ -173,8 +182,18 @@ export class UserService {
       this.logger.error('user not found with this email', email);
       throw new NotFoundException('User not found');
     }
-    this.logger.log(`[User]: ${JSON.stringify(user, null, 2)}`);
+    // this.logger.log(`[User]: ${JSON.stringify(user, null, 2)}`);
     return user;
+  }
+
+  async changeRole(id: number, role: string) {
+    const user = await this.findById(id);
+    const save = await this.userRepository.save({
+      ...user,
+      roles: [role],
+    });
+    this.logger.log('user role is updated', save);
+    return save;
   }
 
   // logout user

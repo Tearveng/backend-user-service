@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, Request } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { LoginDTO } from '../../dto/LoginDTO';
 import { AuthService } from '../auth/auth.service';
 
 @Controller('users')
@@ -14,10 +13,11 @@ export class UserController {
 
   @Get()
   async getAllUsersPagination(
+    @Request() req,
     @Query('page') page = 1,
     @Query('limit') limit = 10,
   ) {
-    return this.userService.paginateUsers(page, limit);
+    return this.userService.paginateUsers(req, page, limit);
   }
 
   // @Post('/login')

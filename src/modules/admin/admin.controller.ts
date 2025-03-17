@@ -27,18 +27,19 @@ export class AdminController {
   ) {}
 
   // constructor(private readonly adminService: AdminService) {}
-  // @Roles('admin')
-  // @UseGuards(RolesGuard)
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
   @Get('/users')
   async getAllUsersPagination(
+    @Request() req,
+    @Query('role') role: string,
     @Query('page') page = 1,
     @Query('limit') limit = 10,
-    @Query('role') role: string
   ) {
-    return this.userService.paginateUsers(page, limit, role);
+    return this.userService.paginateUsers(req, page, limit, role);
   }
 
-  @Roles('admin')
+  @Roles('ADMIN')
   @UseGuards(RolesGuard)
   @Get('/user-info')
   async getById(@Request() req: any) {
@@ -71,5 +72,12 @@ export class AdminController {
   @Delete('/delete-users/:id')
   async delete(@Param('id') id: number) {
     return this.userService.deleteUser(id);
+  }
+
+  @Roles('ADMIN')
+  @UseGuards(RolesGuard)
+  @Put('/change-role/:id')
+  async changeRole(@Param('id') id: number, @Query('role') role: string) {
+    return this.userService.changeRole(id, role);
   }
 }
