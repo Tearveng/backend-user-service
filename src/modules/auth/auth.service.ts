@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import { JwtPayload } from '../../shared/jwt-payload.interface';
-import { UserService } from '../user/user.service';
 import { UsersEntity } from '../../entities/Users';
+import { JwtPayload } from '../../shared/jwt-payload.interface';
 import { decodeToken, isTokenExpired } from '../../utils/Jwt.utils';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -55,6 +55,7 @@ export class AuthService {
       roles: user.roles,
     };
     return {
+      id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       username: user.username,
