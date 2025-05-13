@@ -3,9 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { TodosEntity } from './Todos';
 
 @Entity()
 export class UsersEntity {
@@ -32,6 +34,9 @@ export class UsersEntity {
 
   @Column({ nullable: true })
   publicId: string;
+
+  @OneToMany(() => TodosEntity, (todo) => todo.user)
+  todos: TodosEntity[];
 
   username: string;
 

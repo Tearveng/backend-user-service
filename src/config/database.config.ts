@@ -1,5 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import { UsersEntity } from '../entities/Users';
+import { TodosEntity } from '../entities/Todos';
 
 export default registerAs('database', () => ({
   type: 'mysql',
@@ -8,7 +9,7 @@ export default registerAs('database', () => ({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME, //'eiii_kommerce'
-  entities: [UsersEntity],
+  entities: [UsersEntity, TodosEntity],
   synchronize: true,
   logging: process.env.NODE_ENV === 'development',
   migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],

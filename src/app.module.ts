@@ -15,6 +15,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthModule } from './modules/auth/auth.module';
 import { HeadersMiddleware } from './shared/services/HeadersMiddleware';
 import { RequestContextService } from './shared/services/RequestContextService';
+import { TodoModule } from './modules/todo/todo.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { RequestContextService } from './shared/services/RequestContextService';
     PassportModule,
     CloudinaryModule,
     UserModule,
+    TodoModule,
     AdminModule,
     AuthModule,
   ],
