@@ -5,6 +5,7 @@ import {
   IsBoolean,
   IsDateString,
 } from 'class-validator';
+import { TodoStatus } from '../../shared/enum';
 
 export class CreateTodoDto {
   @IsNotEmpty()
@@ -16,6 +17,9 @@ export class CreateTodoDto {
   @IsOptional()
   @IsBoolean()
   isCompleted?: boolean;
+
+  @IsOptional()
+  status?: TodoStatus;
 
   @IsOptional()
   @IsDateString()

@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UsersEntity } from './Users';
+import { TodoStatus } from '../shared/enum';
 
 @Entity()
 export class TodosEntity {
@@ -18,6 +19,13 @@ export class TodosEntity {
 
   @Column({ nullable: true })
   description: string;
+
+  @Column({
+    type: 'enum',
+    enum: TodoStatus,
+    default: TodoStatus.TODO,
+  })
+  status: TodoStatus;
 
   @Column({ default: false })
   isCompleted: boolean;

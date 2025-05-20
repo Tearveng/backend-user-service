@@ -1,4 +1,10 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TodosEntity } from '../../entities/Todos';
 import { Repository } from 'typeorm';
@@ -18,12 +24,24 @@ export class TodoService {
   ) {}
 
   // create item_todo
-  async create(createTodoDto: CreateTodoDto): Promise<TodosEntity> {
-    const { title, description, isCompleted, dueDate, userId } = createTodoDto;
+  async create(
+    req: Request,
+    createTodoDto: CreateTodoDto,
+  ): Promise<TodosEntity> {
+    const currentUserId = (req as any).user.userId;
+    const {
+      title,
+      description,
+      isCompleted,
+      dueDate,
+      status,
+      userId = currentUserId,
+    } = createTodoDto;
 
     const todo = this.todosRepository.create({
       title,
       description,
+      status,
       dueDate: dueDate ? new Date(dueDate) : null,
       isCompleted: isCompleted ?? false,
     });
@@ -33,5 +51,37 @@ export class TodoService {
     }
     this.logger.log(`[Todo]: Todo created successfully.`);
     return this.todosRepository.save(todo);
+  }
+
+  async findTodoById(id: number) {
+    const todo = this.todosRepository.findOneBy({ id });
+    if (!todo) {
+      throw new NotFoundException('Todo not found with this id: ' + id);
+    }
+
+    return todo;
+  }
+
+  // update item_todo
+  async update(id: number, updateTodoDto: CreateTodoDto): Promise<TodosEntity> {
+    const previousTodo = await this.findTodoById(id);
+    const save = await this.todosRepository.save({
+      ...previousTodo,
+      ...updateTodoDto,
+    });
+    this.logger.log('todo is updated', save);
+    return save;
+  }
+
+  // find all todos pagination
+  async getAllTodos(req: Request) {
+    const currentUserId = (req as any).user.userId;
+    return this.todosRepository.find({
+      where: {
+        user: {
+          id: currentUserId,
+        },
+      },
+    });
   }
 }
