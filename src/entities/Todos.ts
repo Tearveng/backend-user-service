@@ -30,6 +30,9 @@ export class TodosEntity {
   @Column({ default: false })
   isCompleted: boolean;
 
+  @Column()
+  sortOrder: number;
+
   @Column({ type: 'timestamp', nullable: true })
   dueDate: Date;
 
